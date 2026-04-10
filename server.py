@@ -7,9 +7,12 @@ from database import save_incident, get_recent_incidents, get_stats, update_stat
 flask_app = Flask(__name__)
 CORS(flask_app)
 
+from flask import Flask, jsonify, request, send_file
+...
+
 @flask_app.route('/')
 def index():
-    return "Vigilynx API is running!"
+    return send_file('vigilynx_website.html')
 
 @flask_app.route('/api/alerts')
 def api_alerts():
