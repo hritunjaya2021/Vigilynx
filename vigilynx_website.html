@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIGILYNX — AI Campus Surveillance</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#020609;--bg2:#060e1a;--bg3:#0b1628;--bg4:#0f1e35;
+  --green:#00ff88;--green2:#00c864;--green3:rgba(0,255,136,0.07);
+  --cyan:#00e5ff;--red:#ff2244;--orange:#ff8800;--purple:#b388ff;
+  --gray:#3d5a6e;--gray2:#6a8a9e;
+  --text:#e4eef8;--text2:#7090a8;
+  --mono:'Share Tech Mono',monospace;
+  --display:'Orbitron',monospace;
+  --sans:'Rajdhani',sans-serif;
+  --border:rgba(0,255,136,0.08);
+  --border2:rgba(0,255,136,0.2);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);overflow-x:hidden;}
+
+/* GRID BG */
+.grid-bg{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(0,255,136,0.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,255,136,0.025) 1px,transparent 1px);
+  background-size:52px 52px;
+}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:60px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 48px;
+  background:rgba(2,6,9,0.94);
+  border-bottom:1px solid var(--border2);
+  backdrop-filter:blur(18px);
+}
+.logo{font-family:var(--display);font-size:18px;letter-spacing:5px;color:var(--green);
+  text-shadow:0 0 24px rgba(0,255,136,0.4);text-decoration:none;}
+.logo span{color:#fff;text-shadow:none;}
+.nav-links{display:flex;gap:32px;}
+.nav-links a{
+  font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--gray2);
+  text-decoration:none;transition:color .2s;padding:4px 0;
+  border-bottom:1px solid transparent;
+}
+.nav-links a:hover{color:var(--green);border-bottom-color:rgba(0,255,136,0.3);}
+.nav-live{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10px;color:var(--red);}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--red);
+  animation:livepulse 1.2s ease infinite;box-shadow:0 0 8px var(--red);}
+@keyframes livepulse{0%,100%{transform:scale(1);}50%{transform:scale(1.5);opacity:.4;}}
+
+/* ════════════════════════════════
+   HERO
+════════════════════════════════ */
+#home{
+  position:relative;z-index:1;
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:120px 40px 80px;text-align:center;
+  overflow:hidden;
+}
+#home::before{
+  content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:800px;height:800px;border-radius:50%;
+  background:radial-gradient(circle,rgba(0,255,136,0.04) 0%,transparent 65%);
+  pointer-events:none;
+}
+.hero-eyebrow{
+  font-family:var(--mono);font-size:10px;letter-spacing:5px;color:var(--green2);
+  border:1px solid rgba(0,255,136,0.25);padding:7px 22px;border-radius:20px;
+  background:rgba(0,255,136,0.04);margin-bottom:36px;display:inline-block;
+  animation:fadeUp .7s ease both;
+}
+.hero-title{
+  font-family:var(--display);font-size:clamp(52px,9vw,110px);font-weight:900;
+  letter-spacing:8px;line-height:1;
+  background:linear-gradient(135deg,#fff 0%,var(--green) 55%,var(--cyan) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 50px rgba(0,255,136,0.25));
+  animation:fadeUp .7s .1s ease both;margin-bottom:10px;
+}
+.hero-tagline{
+  font-family:var(--display);font-size:clamp(11px,1.6vw,15px);letter-spacing:7px;
+  color:var(--text2);margin-bottom:32px;
+  animation:fadeUp .7s .2s ease both;
+}
+.hero-desc{
+  max-width:580px;font-size:17px;line-height:1.8;color:var(--text2);
+  font-weight:300;margin-bottom:52px;
+  animation:fadeUp .7s .3s ease both;
+}
+.hero-btns{
+  display:flex;gap:16px;justify-content:center;flex-wrap:wrap;
+  animation:fadeUp .7s .4s ease both;
+}
+.btn-g{
+  font-family:var(--mono);font-size:11px;letter-spacing:2px;
+  padding:14px 34px;border-radius:4px;cursor:pointer;
+  background:var(--green);color:#000;border:none;font-weight:700;
+  text-decoration:none;display:inline-block;transition:all .2s;
+}
+.btn-g:hover{background:#fff;box-shadow:0 0 40px rgba(0,255,136,0.35);}
+.btn-o{
+  font-family:var(--mono);font-size:11px;letter-spacing:2px;
+  padding:14px 34px;border-radius:4px;cursor:pointer;
+  background:transparent;color:var(--green);border:1px solid rgba(0,255,136,0.35);
+  text-decoration:none;display:inline-block;transition:all .2s;
+}
+.btn-o:hover{background:rgba(0,255,136,0.07);border-color:var(--green);}
+.hero-metrics{
+  display:flex;gap:60px;margin-top:80px;flex-wrap:wrap;justify-content:center;
+  animation:fadeUp .7s .5s ease both;
+}
+.metric{text-align:center;}
+.metric-val{
+  font-family:var(--display);font-size:38px;font-weight:700;color:var(--green);
+  text-shadow:0 0 24px rgba(0,255,136,0.35);
+}
+.metric-label{font-family:var(--mono);font-size:9px;color:var(--gray2);letter-spacing:2px;margin-top:5px;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:none;}}
+
+/* ════════════════════════════════
+   SHARED SECTION STYLES
+════════════════════════════════ */
+.section{
+  position:relative;z-index:1;
+  max-width:1240px;margin:0 auto;
+  padding:100px 40px;
+}
+.sec-tag{font-family:var(--mono);font-size:9px;letter-spacing:4px;color:var(--green2);margin-bottom:10px;}
+.sec-title{
+  font-family:var(--display);font-size:clamp(26px,3.5vw,40px);font-weight:700;
+  letter-spacing:3px;color:#fff;margin-bottom:14px;
+}
+.sec-sub{font-size:15px;color:var(--text2);max-width:520px;line-height:1.8;margin-bottom:60px;}
+.divider{
+  width:100%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--border2),transparent);
+  margin:0;
+}
+
+/* ════════════════════════════════
+   FEATURES
+════════════════════════════════ */
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.feat-card{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:16px;padding:36px 28px;
+  position:relative;overflow:hidden;
+  transition:all .3s;
+}
+.feat-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--fac,var(--green)),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.feat-card:hover{border-color:rgba(0,255,136,0.2);transform:translateY(-5px);
+  box-shadow:0 24px 64px rgba(0,0,0,0.4);}
+.feat-card:hover::before{opacity:1;}
+.feat-icon{font-size:38px;margin-bottom:22px;display:block;}
+.feat-name{
+  font-family:var(--display);font-size:13px;letter-spacing:2px;
+  color:var(--fac,var(--green));margin-bottom:12px;
+}
+.feat-desc{font-size:14px;color:var(--text2);line-height:1.75;}
+.feat-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  margin-top:20px;font-family:var(--mono);font-size:9px;letter-spacing:2px;
+  padding:4px 12px;border-radius:10px;
+  background:rgba(0,255,136,0.06);color:var(--green2);
+  border:1px solid rgba(0,255,136,0.12);
+}
+.feat-card.ph{--fac:#ff2244;}
+.feat-card.ph .feat-badge{background:rgba(255,34,68,.07);color:#ff2244;border-color:rgba(255,34,68,.2);}
+.feat-card.ht{--fac:#ff8800;}
+.feat-card.ht .feat-badge{background:rgba(255,136,0,.07);color:#ff8800;border-color:rgba(255,136,0,.2);}
+.feat-card.cr{--fac:#b388ff;}
+.feat-card.cr .feat-badge{background:rgba(179,136,255,.07);color:#b388ff;border-color:rgba(179,136,255,.2);}
+
+/* ════════════════════════════════
+   PIPELINE
+════════════════════════════════ */
+.pipeline{display:flex;align-items:stretch;}
+.pipe{
+  flex:1;background:var(--bg3);border:1px solid var(--border);
+  padding:30px 22px;position:relative;
+}
+.pipe:first-child{border-radius:14px 0 0 14px;}
+.pipe:last-child{border-radius:0 14px 14px 0;}
+.pipe:not(:last-child){border-right:none;}
+.pipe:not(:last-child)::after{
+  content:'›';position:absolute;right:-12px;top:50%;transform:translateY(-50%);
+  font-size:22px;color:var(--green2);z-index:2;
+}
+.pipe-n{font-family:var(--display);font-size:30px;font-weight:900;
+  color:rgba(0,255,136,0.1);margin-bottom:14px;}
+.pipe-t{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--green);margin-bottom:8px;}
+.pipe-d{font-size:13px;color:var(--text2);line-height:1.65;}
+
+/* ════════════════════════════════
+   TECH STACK
+════════════════════════════════ */
+.tech-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.tech-card{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:14px;padding:28px 20px;text-align:center;
+  transition:all .25s;cursor:default;
+}
+.tech-card:hover{border-color:var(--border2);background:var(--bg4);transform:translateY(-3px);}
+.tech-emoji{font-size:34px;margin-bottom:14px;display:block;}
+.tech-name{font-family:var(--display);font-size:11px;letter-spacing:2px;color:#fff;margin-bottom:6px;}
+.tech-role{font-family:var(--mono);font-size:9px;color:var(--gray2);letter-spacing:1px;}
+.tech-ver{
+  display:inline-block;margin-top:12px;
+  font-family:var(--mono);font-size:8px;letter-spacing:1px;
+  padding:2px 8px;border-radius:8px;
+  background:var(--green3);color:var(--green2);
+  border:1px solid rgba(0,255,136,0.1);
+}
+
+/* ════════════════════════════════
+   LIVE DASHBOARD
+════════════════════════════════ */
+#livedata{background:var(--bg2);}
+.dash-wrapper{
+  position:relative;z-index:1;
+  max-width:1240px;margin:0 auto;padding:100px 40px;
+}
+.dash-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr 1fr;
+  grid-template-rows:auto auto;
+  gap:16px;
+  margin-top:0;
+}
+.stat-card{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:14px;padding:22px;
+  position:relative;overflow:hidden;transition:all .2s;
+}
+.stat-card:hover{transform:translateY(-2px);border-color:var(--border2);}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--sac,var(--green));}
+.stat-card-val{font-family:var(--display);font-size:42px;font-weight:900;
+  color:var(--sac,var(--green));line-height:1;transition:all .3s;}
+.stat-card-val.pop{animation:pop .3s ease;}
+@keyframes pop{0%{transform:scale(1);}50%{transform:scale(1.1);}100%{transform:scale(1);}}
+.stat-card-lbl{font-family:var(--mono);font-size:9px;color:var(--gray2);
+  letter-spacing:2px;text-transform:uppercase;margin-top:8px;}
+.stat-card.ph{--sac:#ff2244;border-color:rgba(255,34,68,.12);}
+.stat-card.ht{--sac:#ff8800;border-color:rgba(255,136,0,.12);}
+.stat-card.cr{--sac:#b388ff;border-color:rgba(179,136,255,.12);}
+
+.chart-card{
+  grid-column:1/4;
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:14px;overflow:hidden;
+}
+.card-hd{
+  padding:14px 20px;background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.card-hd-title{font-family:var(--mono);font-size:10px;color:var(--green);letter-spacing:3px;}
+.tabs{display:flex;gap:8px;}
+.tbtn{
+  font-family:var(--mono);font-size:9px;letter-spacing:1px;
+  padding:4px 12px;border-radius:6px;
+  border:1px solid var(--border2);background:transparent;
+  color:var(--gray2);cursor:pointer;transition:all .15s;
+}
+.tbtn.on{background:var(--green);color:#000;border-color:var(--green);font-weight:700;}
+.chart-body{padding:18px;height:260px;position:relative;}
+.chart-foot{
+  display:flex;gap:20px;padding:10px 20px 14px;
+  font-family:var(--mono);font-size:9px;color:var(--gray2);
+  border-top:1px solid var(--border);flex-wrap:wrap;
+}
+.leg{display:flex;align-items:center;gap:6px;}
+.leg-dot{width:7px;height:7px;border-radius:50%;}
+
+.alerts-card{
+  grid-column:4/5;grid-row:2/4;
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;
+  display:flex;flex-direction:column;max-height:420px;
+}
+.alerts-hd{
+  padding:14px 16px;background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  font-family:var(--mono);font-size:10px;color:var(--green);letter-spacing:3px;
+  flex-shrink:0;
+}
+.abadge{
+  background:var(--red);color:#fff;
+  font-family:var(--mono);font-size:10px;
+  padding:2px 9px;border-radius:10px;
+}
+.alerts-scroll{flex:1;overflow-y:auto;}
+.arow{
+  display:flex;gap:10px;align-items:flex-start;
+  padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.03);
+  animation:slideIn .3s ease;transition:background .15s;
+}
+.arow:hover{background:rgba(255,255,255,0.02);}
+@keyframes slideIn{from{opacity:0;transform:translateX(8px);}to{opacity:1;transform:none;}}
+.adot{width:7px;height:7px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+.abody{flex:1;}
+.atype{font-size:12px;font-weight:700;}
+.ameta{font-family:var(--mono);font-size:9px;color:var(--gray2);margin-top:3px;}
+.aconf{font-family:var(--mono);font-size:10px;color:var(--gray2);flex-shrink:0;}
+.aempty{padding:40px;text-align:center;font-family:var(--mono);font-size:11px;color:var(--gray);line-height:2;}
+.arow-top{display:flex;gap:10px;align-items:flex-start;margin-bottom:4px;}
+
+/* ── CAMERA FEED ── */
+.cam-card{
+  grid-column:4/5;grid-row:1/2;
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;
+  display:flex;flex-direction:column;
+}
+.cam-hd{
+  padding:10px 16px;background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  font-family:var(--mono);font-size:10px;color:var(--green);letter-spacing:3px;
+  flex-shrink:0;
+}
+.cam-body{flex:1;position:relative;background:#000;min-height:160px;}
+.cam-body img{width:100%;height:100%;object-fit:cover;display:block;}
+.cam-overlay{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:6px 10px;background:rgba(0,0,0,.65);
+  font-family:var(--mono);font-size:8px;color:var(--green2);letter-spacing:1px;
+  display:flex;align-items:center;gap:6px;
+}
+.cam-status-dot{width:5px;height:5px;border-radius:50%;background:var(--green);
+  animation:livepulse 1.2s ease infinite;}
+.cam-offline{position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:8px;
+  font-family:var(--mono);font-size:9px;color:var(--gray2);letter-spacing:1px;}
+.cam-offline svg{opacity:.25;}
+
+/* ── CONNECTION STATUS BAR ── */
+.conn-bar{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 16px;margin-bottom:16px;
+  background:var(--bg3);border:1px solid var(--border);border-radius:10px;
+  font-family:var(--mono);font-size:9px;color:var(--gray2);letter-spacing:1px;
+}
+.conn-dot{width:7px;height:7px;border-radius:50%;background:var(--gray);flex-shrink:0;transition:background .4s;}
+.conn-dot.online{background:var(--green);box-shadow:0 0 8px rgba(0,255,136,.5);animation:livepulse 1.2s ease infinite;}
+.conn-dot.offline{background:var(--red);}
+#connText{transition:color .3s;}
+#connText.online{color:var(--green);}
+#connText.offline{color:var(--red);}
+#lastSync{margin-left:auto;}
+
+.brk-card{
+  grid-column:1/4;
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:14px;padding:20px 26px;
+  display:flex;gap:24px;align-items:center;
+}
+.brk-title{font-family:var(--mono);font-size:9px;color:var(--gray2);
+  letter-spacing:2px;white-space:nowrap;}
+.brk-bars{flex:1;display:flex;flex-direction:column;gap:10px;}
+.brk-row{display:flex;align-items:center;gap:12px;}
+.brk-name{font-family:var(--mono);font-size:9px;width:72px;flex-shrink:0;letter-spacing:1px;}
+.brk-track{flex:1;height:5px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;}
+.brk-fill{height:100%;border-radius:3px;transition:width .7s ease;}
+.brk-n{font-family:var(--mono);font-size:10px;width:24px;text-align:right;}
+
+/* ════════════════════════════════
+   TEAM
+════════════════════════════════ */
+.team-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:18px;}
+.team-card{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:16px;padding:30px 20px;text-align:center;
+  transition:all .3s;position:relative;overflow:hidden;
+}
+.team-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--green2),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.team-card:hover{border-color:var(--border2);transform:translateY(-5px);
+  box-shadow:0 20px 60px rgba(0,0,0,0.5);}
+.team-card:hover::before{opacity:1;}
+.team-card.lead{border-color:rgba(0,255,136,0.2);
+  background:linear-gradient(180deg,rgba(0,255,136,0.04),var(--bg3));}
+.avatar{
+  width:68px;height:68px;border-radius:50%;
+  margin:0 auto 16px;
+  background:linear-gradient(135deg,var(--bg2),var(--bg4));
+  border:2px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;position:relative;
+}
+.team-card.lead .avatar{border-color:var(--green2);
+  box-shadow:0 0 20px rgba(0,255,136,0.2);}
+.lead-crown{
+  position:absolute;top:-10px;right:-4px;font-size:16px;
+}
+.tname{font-family:var(--display);font-size:11px;letter-spacing:1px;color:#fff;margin-bottom:5px;}
+.trole{font-family:var(--mono);font-size:9px;color:var(--green2);letter-spacing:2px;margin-bottom:8px;}
+.trollno{font-family:var(--mono);font-size:8px;color:var(--gray2);}
+
+.mentor-card{
+  background:var(--bg3);border:1px solid rgba(0,229,255,0.2);
+  border-radius:16px;padding:36px;
+  display:flex;gap:28px;align-items:center;
+  margin-top:36px;
+}
+.mentor-avatar{
+  width:80px;height:80px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--bg2),var(--bg4));
+  border:2px solid rgba(0,229,255,0.3);
+  display:flex;align-items:center;justify-content:center;font-size:32px;
+  box-shadow:0 0 24px rgba(0,229,255,0.1);
+}
+.mentor-title{font-family:var(--mono);font-size:9px;letter-spacing:3px;
+  color:var(--cyan);margin-bottom:8px;}
+.mentor-name{font-family:var(--display);font-size:18px;letter-spacing:2px;color:#fff;margin-bottom:6px;}
+.mentor-dept{font-size:14px;color:var(--text2);}
+
+/* ════════════════════════════════
+   FOOTER
+════════════════════════════════ */
+footer{
+  position:relative;z-index:1;
+  border-top:1px solid var(--border);
+  padding:40px 48px;
+  display:flex;align-items:center;justify-content:space-between;
+  font-family:var(--mono);font-size:10px;color:var(--gray2);
+  flex-wrap:wrap;gap:16px;
+}
+.foot-logo{font-family:var(--display);font-size:14px;letter-spacing:4px;color:var(--green);}
+.foot-logo span{color:#fff;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .feat-grid{grid-template-columns:1fr 1fr;}
+  .tech-grid{grid-template-columns:1fr 1fr;}
+  .team-grid{grid-template-columns:1fr 1fr;}
+  .pipeline{flex-direction:column;}
+  .pipe:not(:last-child){border-right:1px solid var(--border);border-bottom:none;}
+  .pipe:first-child{border-radius:14px 14px 0 0;}
+  .pipe:last-child{border-radius:0 0 14px 14px;}
+  .pipe:not(:last-child)::after{content:'↓';right:50%;bottom:-12px;top:auto;transform:translateX(50%);}
+  .nav-links{display:none;}
+  .dash-grid{grid-template-columns:1fr 1fr;}
+  .chart-card,.brk-card,.alerts-card,.cam-card{grid-column:1/-1;}
+  .alerts-card{grid-row:auto;max-height:320px;}
+  .cam-card{grid-row:auto;}
+}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+
+<!-- ── NAV ── -->
+<nav>
+  <a href="#home" class="logo">VIGIL<span>YNX</span></a>
+  <div class="nav-links">
+    <a href="#home">Home</a>
+    <a href="#livedata">Live Data</a>
+    <a href="#features">Features</a>
+    <a href="#pipeline">Pipeline</a>
+    <a href="#techstack">Tech Stack</a>
+    <a href="#team">Team</a>
+  </div>
+  <div class="nav-live"><div class="live-dot"></div>LIVE</div>
+</nav>
+
+<!-- ══════════════════════════════
+     HERO
+══════════════════════════════ -->
+<section id="home">
+  <div class="hero-eyebrow">PROJEXA 26E2132 · CODE BUGS · K.R MANGALAM UNIVERSITY</div>
+  <h1 class="hero-title">VIGILYNX</h1>
+  <div class="hero-tagline">AI-POWERED CAMPUS SURVEILLANCE SYSTEM</div>
+  <p class="hero-desc">
+    Real-time detection of exam violations and campus security threats using
+    computer vision. Monitors phone usage, head turns, and crowd formation
+    — instantly alerting staff before incidents escalate.
+  </p>
+  <div class="hero-btns">
+    <a href="#livedata" class="btn-g">VIEW LIVE DATA</a>
+    <a href="#features" class="btn-o">EXPLORE FEATURES</a>
+  </div>
+  <div class="hero-metrics">
+    <div class="metric"><div class="metric-val">3</div><div class="metric-label">Detections</div></div>
+    <div class="metric"><div class="metric-val">&lt;1s</div><div class="metric-label">Response Time</div></div>
+    <div class="metric"><div class="metric-val">24/7</div><div class="metric-label">Monitoring</div></div>
+    <div class="metric"><div class="metric-val">5</div><div class="metric-label">Team Members</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════
+     LIVE DATA
+══════════════════════════════ -->
+<div id="livedata">
+<div class="dash-wrapper">
+  <div class="sec-tag">REAL-TIME</div>
+  <div class="sec-title">LIVE DASHBOARD</div>
+  <p class="sec-sub">Live incident data pulled from the detection system. Updates every 3 seconds.</p>
+
+  <!-- Connection status bar -->
+  <div class="conn-bar">
+    <div class="conn-dot offline" id="connDot"></div>
+    <span id="connText" class="offline">CONNECTING TO VIGILYNX BACKEND...</span>
+    <span id="lastSync"></span>
+  </div>
+
+  <div class="dash-grid">
+    <!-- stat cards row 1 -->
+    <div class="stat-card">
+      <div class="stat-card-val" id="sTotal">0</div>
+      <div class="stat-card-lbl">Total Alerts</div>
+    </div>
+    <div class="stat-card ph">
+      <div class="stat-card-val" id="sPhone">0</div>
+      <div class="stat-card-lbl">Phone Detected</div>
+    </div>
+    <div class="stat-card ht">
+      <div class="stat-card-val" id="sHead">0</div>
+      <div class="stat-card-lbl">Head Turn</div>
+    </div>
+
+    <!-- camera feed (col 4, row 1) -->
+    <div class="cam-card">
+      <div class="cam-hd">
+        CAM-01 · LIVE
+        <div class="live-dot" style="width:6px;height:6px;"></div>
+      </div>
+      <div class="cam-body" id="camBody">
+        <!-- offline placeholder -->
+        <div class="cam-offline" id="camOffline">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6a8a9e" stroke-width="1.5">
+            <path d="M15 10l4.553-2.069A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+            <line x1="1" y1="1" x2="23" y2="23"/>
+          </svg>
+          CAMERA OFFLINE
+        </div>
+        <img id="camFeed" src="" alt="Live Feed" style="display:none;width:100%;height:100%;object-fit:cover;"
+          onload="document.getElementById('camOffline').style.display='none';this.style.display='block';"
+          onerror="document.getElementById('camOffline').style.display='flex';this.style.display='none';">
+        <div class="cam-overlay" id="camOverlay" style="display:none;">
+          <div class="cam-status-dot"></div>
+          VIGILYNX · <span id="camTimestamp"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- stat cards row 2 (cols 1-3) -->
+    <div class="stat-card cr">
+      <div class="stat-card-val" id="sCrowd">0</div>
+      <div class="stat-card-lbl">Crowd Detected</div>
+    </div>
+
+    <!-- chart -->
+    <div class="chart-card">
+      <div class="card-hd">
+        <span class="card-hd-title">ALERT ACTIVITY</span>
+        <div class="tabs">
+          <button class="tbtn on" onclick="switchChart('line',this)">LINE</button>
+          <button class="tbtn" onclick="switchChart('bar',this)">BAR</button>
+        </div>
+      </div>
+      <div class="chart-body"><canvas id="actChart"></canvas></div>
+      <div class="chart-foot">
+        <div class="leg"><div class="leg-dot" style="background:#ff2244"></div>Phone</div>
+        <div class="leg"><div class="leg-dot" style="background:#ff8800"></div>Head Turn</div>
+        <div class="leg"><div class="leg-dot" style="background:#b388ff"></div>Crowd</div>
+        <span style="margin-left:auto;font-size:9px;">Rolling 20 pts · 3s interval</span>
+      </div>
+    </div>
+
+    <!-- alerts -->
+    <div class="alerts-card">
+      <div class="alerts-hd">
+        INCIDENTS
+        <span class="abadge" id="aBadge">0</span>
+      </div>
+      <div class="alerts-scroll" id="alertsList">
+        <div class="aempty">● MONITORING<br><br>No incidents yet.</div>
+      </div>
+    </div>
+
+    <!-- breakdown -->
+    <div class="brk-card">
+      <span class="brk-title">DETECTION<br>BREAKDOWN</span>
+      <div class="brk-bars">
+        <div class="brk-row">
+          <span class="brk-name" style="color:#ff2244;">PHONE</span>
+          <div class="brk-track"><div class="brk-fill" id="bPhone" style="width:0%;background:#ff2244;"></div></div>
+          <span class="brk-n" style="color:#ff2244;" id="bcPhone">0</span>
+        </div>
+        <div class="brk-row">
+          <span class="brk-name" style="color:#ff8800;">HEAD TURN</span>
+          <div class="brk-track"><div class="brk-fill" id="bHead" style="width:0%;background:#ff8800;"></div></div>
+          <span class="brk-n" style="color:#ff8800;" id="bcHead">0</span>
+        </div>
+        <div class="brk-row">
+          <span class="brk-name" style="color:#b388ff;">CROWD</span>
+          <div class="brk-track"><div class="brk-fill" id="bCrowd" style="width:0%;background:#b388ff;"></div></div>
+          <span class="brk-n" style="color:#b388ff;" id="bcCrowd">0</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end dash-grid -->
+</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════
+     FEATURES
+══════════════════════════════ -->
+<section id="features">
+  <div class="sec-tag">CAPABILITIES</div>
+  <div class="sec-title">WHAT VIGILYNX DETECTS</div>
+  <p class="sec-sub">Three core detection modules working in real-time using background subtraction and computer vision.</p>
+  <div class="feat-grid">
+    <div class="feat-card ph">
+      <span class="feat-icon">📱</span>
+      <div class="feat-name">PHONE DETECTION</div>
+      <p class="feat-desc">Identifies mobile phones held by students during exams using shape analysis, aspect ratio filtering, and edge density checks. Fires an alert after 5 consistent frames with 20-second suppression to avoid spam.</p>
+      <span class="feat-badge">● ACTIVE</span>
+    </div>
+    <div class="feat-card ht">
+      <span class="feat-icon">👀</span>
+      <div class="feat-name">HEAD TURN DETECTION</div>
+      <p class="feat-desc">Tracks face position using Haar Cascade. Detects sustained lateral head movement over a 2-second window — differentiating genuine cheating glances from natural head movement during exams.</p>
+      <span class="feat-badge">● ACTIVE</span>
+    </div>
+    <div class="feat-card cr">
+      <span class="feat-icon">👥</span>
+      <div class="feat-name">CROWD DETECTION</div>
+      <p class="feat-desc">Detects gatherings of 10 or more people with 8+ closely spaced individuals using contour clustering. Useful for monitoring corridors, entrances, and outdoor spaces for unauthorised assemblies.</p>
+      <span class="feat-badge">● ACTIVE</span>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════
+     PIPELINE
+══════════════════════════════ -->
+<section id="pipeline">
+  <div class="sec-tag">HOW IT WORKS</div>
+  <div class="sec-title">DETECTION PIPELINE</div>
+  <p class="sec-sub">From raw camera feed to logged alert in under one second.</p>
+  <div class="pipeline">
+    <div class="pipe">
+      <div class="pipe-n">01</div>
+      <div class="pipe-t">CAPTURE</div>
+      <p class="pipe-d">Webcam feed captured via OpenCV DirectShow at 640×480. Buffer flushed every frame to eliminate lag.</p>
+    </div>
+    <div class="pipe">
+      <div class="pipe-n">02</div>
+      <div class="pipe-t">PREPROCESS</div>
+      <p class="pipe-d">Frame resized, converted to grayscale, Gaussian blurred. Background subtractor builds a motion mask.</p>
+    </div>
+    <div class="pipe">
+      <div class="pipe-n">03</div>
+      <div class="pipe-t">DETECT</div>
+      <p class="pipe-d">Contours extracted from motion mask. Each contour checked by Phone, Head Turn, and Crowd detectors simultaneously.</p>
+    </div>
+    <div class="pipe">
+      <div class="pipe-n">04</div>
+      <div class="pipe-t">ALERT</div>
+      <p class="pipe-d">On confirmation, alert logged to MongoDB (or in-memory), sound played via winsound, flash overlay triggered.</p>
+    </div>
+    <div class="pipe">
+      <div class="pipe-n">05</div>
+      <div class="pipe-t">DASHBOARD</div>
+      <p class="pipe-d">Flask REST API serves live stats and alert log. This website polls every 1.5–3s for real-time updates.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════
+     TECH STACK
+══════════════════════════════ -->
+<section id="techstack">
+  <div class="sec-tag">BUILT WITH</div>
+  <div class="sec-title">TECH STACK</div>
+  <p class="sec-sub">Entirely built with open-source tools — no paid APIs, no cloud dependency.</p>
+  <div class="tech-grid">
+    <div class="tech-card">
+      <span class="tech-emoji">🐍</span>
+      <div class="tech-name">PYTHON</div>
+      <div class="tech-role">Core language</div>
+      <span class="tech-ver">v3.10+</span>
+    </div>
+    <div class="tech-card">
+      <span class="tech-emoji">👁️</span>
+      <div class="tech-name">OPENCV</div>
+      <div class="tech-role">Computer vision · detection</div>
+      <span class="tech-ver">cv2 4.x</span>
+    </div>
+    <div class="tech-card">
+      <span class="tech-emoji">🌐</span>
+      <div class="tech-name">FLASK</div>
+      <div class="tech-role">REST API · dashboard server</div>
+      <span class="tech-ver">v3.x</span>
+    </div>
+    <div class="tech-card">
+      <span class="tech-emoji">🍃</span>
+      <div class="tech-name">MONGODB</div>
+      <div class="tech-role">Incident storage · logging</div>
+      <span class="tech-ver">PyMongo</span>
+    </div>
+    <div class="tech-card">
+      <span class="tech-emoji">🔢</span>
+      <div class="tech-name">NUMPY</div>
+      <div class="tech-role">Array ops · math</div>
+      <span class="tech-ver">v1.24+</span>
+    </div>
+    <div class="tech-card">
+      <span class="tech-emoji">🎵</span>
+      <div class="tech-name">WINSOUND</div>
+      <div class="tech-role">Audio alerts · beep tones</div>
+      <span class="tech-ver">stdlib</span>
+    </div>
+    <div class="tech-card">
+      <span class="tech-emoji">📊</span>
+      <div class="tech-name">CHART.JS</div>
+      <div class="tech-role">Live activity graph</div>
+      <span class="tech-ver">v4.4</span>
+    </div>
+    <div class="tech-card">
+      <span class="tech-emoji">🎨</span>
+      <div class="tech-name">HTML / CSS / JS</div>
+      <div class="tech-role">Dashboard frontend</div>
+      <span class="tech-ver">Vanilla</span>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════
+     TEAM
+══════════════════════════════ -->
+<section id="team">
+  <div class="sec-tag">THE PEOPLE</div>
+  <div class="sec-title">TEAM CODE BUGS</div>
+  <p class="sec-sub">Team ID: 26E2132 · K.R Mangalam University · Projexa 2026</p>
+
+  <div class="team-grid">
+    <div class="team-card lead">
+      <div class="avatar">🧠<span class="lead-crown">👑</span></div>
+      <div class="tname">HRITUNJAYA CHAUHAN</div>
+      <div class="trole">TEAM LEAD</div>
+      <div class="trollno">2401420024</div>
+    </div>
+    <div class="team-card">
+      <div class="avatar">💻</div>
+      <div class="tname">KASHISH SHARMA</div>
+      <div class="trole">DEVELOPER</div>
+      <div class="trollno">2401420039</div>
+    </div>
+    <div class="team-card">
+      <div class="avatar">🎨</div>
+      <div class="tname">JAHANVI DESWAL</div>
+      <div class="trole">DEVELOPER</div>
+      <div class="trollno">2401420026</div>
+    </div>
+    <div class="team-card">
+      <div class="avatar">⚙️</div>
+      <div class="tname">TUSHAR</div>
+      <div class="trole">DEVELOPER</div>
+      <div class="trollno">2401420040</div>
+    </div>
+    <div class="team-card">
+      <div class="avatar">🔬</div>
+      <div class="tname">RAMAN</div>
+      <div class="trole">DEVELOPER</div>
+      <div class="trollno">2401420033</div>
+    </div>
+  </div>
+
+  <!-- MENTOR -->
+  <div class="mentor-card">
+    <div class="mentor-avatar">🎓</div>
+    <div>
+      <div class="mentor-title">INTERNAL MENTOR</div>
+      <div class="mentor-name">Mr. Nandan Kumar Mishra</div>
+      <div class="mentor-dept">K.R Mangalam University · Faculty Guide · Projexa 2026</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-logo">VIGIL<span>YNX</span></div>
+  <span>TEAM CODE BUGS · 26E2132 · K.R MANGALAM UNIVERSITY · 2026</span>
+  <span id="footClock" style="color:var(--green);"></span>
+</footer>
+
+<!-- ══════════════════════════════
+     SCRIPTS
+══════════════════════════════ -->
+<script>
+const API = 'http://localhost:5000';
+
+// Clock
+setInterval(()=>{
+  const t = new Date().toLocaleTimeString('en-GB');
+  document.getElementById('footClock').textContent = t;
+}, 1000);
+
+// ── Connection Status ─────────────────────────────────────
+let isOnline = false;
+function setOnline(online){
+  if(isOnline === online) return;
+  isOnline = online;
+  const dot  = document.getElementById('connDot');
+  const txt  = document.getElementById('connText');
+  dot.className = 'conn-dot ' + (online ? 'online' : 'offline');
+  txt.className = online ? 'online' : 'offline';
+  txt.textContent = online
+    ? '● CONNECTED TO VIGILYNX BACKEND — LIVE'
+    : '✕ BACKEND OFFLINE — RETRYING...';
+}
+function updateSyncTime(){
+  document.getElementById('lastSync').textContent =
+    'LAST SYNC ' + new Date().toLocaleTimeString('en-GB');
+}
+
+// ── Camera Feed ───────────────────────────────────────────
+let camOk = false;
+function refreshCam(){
+  const img = document.getElementById('camFeed');
+  const overlay = document.getElementById('camOverlay');
+  const ts = document.getElementById('camTimestamp');
+  // Use frame endpoint (single JPEG, avoids MJPEG cross-origin issues)
+  img.src = API + '/video_feed_frame?t=' + Date.now();
+  img.onload = ()=>{
+    camOk = true;
+    document.getElementById('camOffline').style.display = 'none';
+    img.style.display = 'block';
+    overlay.style.display = 'flex';
+    ts.textContent = new Date().toLocaleTimeString('en-GB');
+  };
+  img.onerror = ()=>{
+    camOk = false;
+    document.getElementById('camOffline').style.display = 'flex';
+    img.style.display = 'none';
+    overlay.style.display = 'none';
+  };
+}
+setInterval(refreshCam, 250); // ~4fps snapshot polling
+refreshCam();
+
+// ── Chart ─────────────────────────────────────────────────
+const MAX=20, labs=[], pD=[], hD=[], cD=[];
+let prev={phone:0,head_turn:0,crowd:0};
+const cctx = document.getElementById('actChart').getContext('2d');
+
+function mkDS(fill){
+  return [
+    {label:'Phone',    data:pD,borderColor:'#ff2244',backgroundColor:'rgba(255,34,68,0.1)',
+     pointBackgroundColor:'#ff2244',tension:0.4,fill,borderWidth:2,pointRadius:3},
+    {label:'Head Turn',data:hD,borderColor:'#ff8800',backgroundColor:'rgba(255,136,0,0.07)',
+     pointBackgroundColor:'#ff8800',tension:0.4,fill,borderWidth:2,pointRadius:3},
+    {label:'Crowd',    data:cD,borderColor:'#b388ff',backgroundColor:'rgba(179,136,255,0.07)',
+     pointBackgroundColor:'#b388ff',tension:0.4,fill,borderWidth:2,pointRadius:3},
+  ];
+}
+const opts={
+  responsive:true,maintainAspectRatio:false,animation:{duration:350},
+  interaction:{mode:'index',intersect:false},
+  scales:{
+    x:{ticks:{color:'#3d5a6e',font:{family:'Share Tech Mono',size:8},maxRotation:40,maxTicksLimit:8},
+       grid:{color:'rgba(0,255,136,0.03)'}},
+    y:{beginAtZero:true,ticks:{color:'#3d5a6e',stepSize:1,font:{family:'Share Tech Mono',size:9}},
+       grid:{color:'rgba(0,255,136,0.05)'}}
+  },
+  plugins:{legend:{display:false},tooltip:{
+    backgroundColor:'#0b1628',borderColor:'rgba(0,255,136,0.2)',borderWidth:1,
+    titleColor:'#00ff88',bodyColor:'#e4eef8',
+    titleFont:{family:'Share Tech Mono'},bodyFont:{family:'Share Tech Mono'}
+  }}
+};
+let myChart=new Chart(cctx,{type:'line',data:{labels:labs,datasets:mkDS(true)},options:opts});
+
+function switchChart(t,btn){
+  document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  myChart.destroy();
+  myChart=new Chart(cctx,{type:t,data:{labels:labs,datasets:mkDS(t==='line')},options:opts});
+}
+function pushPt(p,h,c){
+  labs.push(new Date().toLocaleTimeString('en-GB'));
+  pD.push(p);hD.push(h);cD.push(c);
+  if(labs.length>MAX){labs.shift();pD.shift();hD.shift();cD.shift();}
+  myChart.update();
+}
+
+// ── Stats ─────────────────────────────────────────────────
+function bump(id){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop');
+}
+function fetchStats(){
+  fetch(API+'/api/stats')
+    .then(r=>r.json())
+    .then(d=>{
+      setOnline(true); updateSyncTime();
+      const t=d.total||0,p=d.phone||0,h=d.head_turn||0,c=d.crowd||0;
+      [['sTotal',t],['sPhone',p],['sHead',h],['sCrowd',c]].forEach(([id,v])=>{
+        const el=document.getElementById(id);
+        if(el && +el.textContent!==v){el.textContent=v; bump(id);}
+      });
+      const mx=Math.max(p,h,c,1);
+      document.getElementById('bPhone').style.width=(p/mx*100)+'%';
+      document.getElementById('bHead' ).style.width=(h/mx*100)+'%';
+      document.getElementById('bCrowd').style.width=(c/mx*100)+'%';
+      document.getElementById('bcPhone').textContent=p;
+      document.getElementById('bcHead' ).textContent=h;
+      document.getElementById('bcCrowd').textContent=c;
+      const dp=Math.max(0,p-prev.phone),dh=Math.max(0,h-prev.head_turn),dc=Math.max(0,c-prev.crowd);
+      prev={phone:p,head_turn:h,crowd:c};
+      pushPt(dp,dh,dc);
+    }).catch(()=>{setOnline(false);pushPt(0,0,0);});
+}
+
+// ── Alerts ────────────────────────────────────────────────
+const COL={phone:'#ff2244',head_turn:'#ff8800',crowd:'#b388ff'};
+const ICO={phone:'📱',head_turn:'👀',crowd:'👥'};
+const LBL={phone:'Phone Detected',head_turn:'Head Turn',crowd:'Crowd Detected'};
+
+function getType(a){
+  const raw=(a.type||a.event_type||a.label||a.incident_type||'').toString().toLowerCase();
+  if(raw.includes('phone'))  return 'phone';
+  if(raw.includes('head'))   return 'head_turn';
+  if(raw.includes('crowd'))  return 'crowd';
+  return raw||'unknown';
+}
+
+function renderAlerts(data){
+  document.getElementById('aBadge').textContent=data.length;
+  if(!data.length){
+    document.getElementById('alertsList').innerHTML='<div class="aempty">● MONITORING<br><br>No incidents yet.</div>';
+    return;
+  }
+  document.getElementById('alertsList').innerHTML=data.map(a=>{
+    const t    = getType(a);
+    const col  = COL[t]||'#90a4ae';
+    const ts   = a.ts||a.time||a.timestamp||'';
+    const id   = a.id||a._id||'';
+    const conf = Math.round((a.conf||a.confidence||0)*100);
+    return `<div class="arow">
+      <div class="arow-top">
+        <div class="adot" style="background:${col};box-shadow:0 0 5px ${col}55;margin-top:5px;flex-shrink:0;width:7px;height:7px;border-radius:50%;"></div>
+        <div class="abody" style="flex:1;">
+          <div class="atype" style="color:${col};font-size:13px;font-weight:700;">${ICO[t]||'⚠️'} ${LBL[t]||t}</div>
+          <div class="ameta" style="font-family:var(--mono);font-size:9px;color:var(--gray2);margin-top:3px;">${ts} · CAM-01 · #${id}</div>
+        </div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--gray2);flex-shrink:0;">${conf}%</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function fetchAlerts(){
+  fetch(API+'/api/alerts').then(r=>r.json()).then(data=>{
+    setOnline(true);
+    renderAlerts(data);
+  }).catch(()=>{setOnline(false);});
+}
+
+fetchStats(); fetchAlerts();
+setInterval(fetchStats,3000);
+setInterval(fetchAlerts,1500);</script>
+</body>
+</html>
