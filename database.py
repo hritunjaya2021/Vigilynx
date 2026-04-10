@@ -12,8 +12,10 @@ _in_memory  = []
 _id_counter = [0]
 
 try:
+    import os
     from pymongo import MongoClient
-    _client     = MongoClient('mongodb://localhost:27017/',
+    _mongo_uri  = os.environ.get('MONGO_URI', 'mongodb://localhost:27017/')
+    _client     = MongoClient(_mongo_uri,
                               serverSelectionTimeoutMS=2000)
     _client.server_info()
     _db         = _client['vigilynx']
